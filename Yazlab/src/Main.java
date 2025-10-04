@@ -4,18 +4,18 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-/*import javafx.application.Application;
+import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;*/
+import javafx.stage.Stage;
 import java.sql.*;
 
 import java.io.*;
 
-public class Main// extends Application
+public class Main extends Application
 {
-    /*
+
     // sample code for javafx, no idea how it works but it opens a window with a button
     @Override
     public void start(Stage primaryStage)
@@ -33,7 +33,7 @@ public class Main// extends Application
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    */
+
 
     // good old main
     public static void main(String[] args)
@@ -77,43 +77,10 @@ public class Main// extends Application
         }
 
         // below is mysql sample code
-        String url = "jdbc:mysql://localhost:3306/muhendislik_fakulte?serverTimezone=UTC&useSSL=false";
-        String user = "root";
-        String pass = "yazlab1"; // root şifresini yazlab1 yap öteki türlü giremezsin
-
-        try
-        {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // optional on modern JDKs
-            try (Connection conn = DriverManager.getConnection(url, user, pass))
-            {
-                // create table
-                try (Statement st = conn.createStatement())
-                {
-                    st.executeUpdate("CREATE TABLE IF NOT EXISTS ornek_tablo_sil (id INT AUTO_INCREMENT PRIMARY KEY, text VARCHAR(255))");
-                }
-                // insert
-                try (PreparedStatement ps = conn.prepareStatement("INSERT INTO ornek_tablo_sil (text) VALUES (?)"))
-                {
-                    ps.setString(1, "hello from java");
-                    ps.executeUpdate();
-                }
-                // query
-                try (PreparedStatement ps = conn.prepareStatement("SELECT id, text FROM ornek_tablo_sil");
-                     ResultSet rs = ps.executeQuery())
-                {
-                    while (rs.next())
-                    {
-                        System.out.println(rs.getInt("id") + " -> " + rs.getString("text"));
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        SQL_Init.Initialize();
+        Auth.CheckAccInfo();
 
         // this probaby opens the window
-        //launch(args);
+        launch(args);
     }
 }
