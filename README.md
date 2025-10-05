@@ -1,7 +1,7 @@
-The snow starts to melt away.
-The sunshine splits the light to life.
-The color of mountain turn into green.
-Everything changes in your heart.
+The snow starts to melt away
+The sunshine splits the light to life
+The color of mountain turn into green
+Everything changes in your heart
 
 
 The old trees have new cherry blossoms
