@@ -33,9 +33,8 @@ public class SQL_Init
                 {
                     System.out.println("Dbg SQL: Creating table bolum_koordinator...");
                     st.executeUpdate("CREATE TABLE IF NOT EXISTS bolum_koordinator (" +
-                            "koordinator_id INT AUTO_INCREMENT PRIMARY KEY," +
                             "isim VARCHAR(128)," +
-                            "eposta VARCHAR(256) UNIQUE," +
+                            "eposta VARCHAR(256) PRIMARY KEY," +
                             "sifre VARCHAR(64)," +
                             "bolum VARCHAR(128)," +
                             "is_admin BOOLEAN)");
@@ -49,9 +48,8 @@ public class SQL_Init
                 {
                     System.out.println("Dbg SQL: Creating table derslik...");
                     st.executeUpdate("CREATE TABLE IF NOT EXISTS derslik (" +
-                            "derslik_id INT AUTO_INCREMENT PRIMARY KEY," +
                             "isim VARCHAR(128)," +
-                            "kod VARCHAR(64) UNIQUE," +
+                            "kod VARCHAR(64) PRIMARY KEY," +
                             "enine_sira INT," +
                             "boyuna_sira INT," +
                             "sira_koltuk INT," +
@@ -67,9 +65,9 @@ public class SQL_Init
                 {
                     System.out.println("Dbg SQL: Creating table ders...");
                     st.executeUpdate("CREATE TABLE IF NOT EXISTS ders (" +
-                            "ders_id INT AUTO_INCREMENT PRIMARY KEY," +
+                            "sinif INT," +
                             "isim VARCHAR(128)," +
-                            "kod VARCHAR(64) UNIQUE," +
+                            "kod VARCHAR(64) PRIMARY KEY," +
                             "hoca VARCHAR(128))");
                 }
                 catch (Exception e)
@@ -81,9 +79,8 @@ public class SQL_Init
                 {
                     System.out.println("Dbg SQL: Creating table ogrenci...");
                     st.executeUpdate("CREATE TABLE IF NOT EXISTS ogrenci (" +
-                            "ogrenci_id INT AUTO_INCREMENT PRIMARY KEY," +
                             "isim VARCHAR(128)," +
-                            "numara VARCHAR(64) UNIQUE," +
+                            "numara VARCHAR(64) PRIMARY KEY," +
                             "sinif INT)");
                 }
                 catch (Exception e)
@@ -95,10 +92,12 @@ public class SQL_Init
                 {
                     System.out.println("Dbg SQL: Creating table ogrenci_ders...");
                     st.executeUpdate("CREATE TABLE IF NOT EXISTS ogrenci_ders (" +
-                            "id INT AUTO_INCREMENT PRIMARY KEY," +
                             "ogrenci_numara VARCHAR(64)," +
                             "ders_kod VARCHAR(64)," +
-                            "UNIQUE (ogrenci_numara, ders_kod))");
+                            "FOREIGN KEY (ogrenci_numara) REFERENCES ogrenci(numara)," +
+                            "FOREIGN KEY (ders_kod) REFERENCES ders(kod)," +
+                            "PRIMARY KEY (ogrenci_numara, ders_kod))");
+
                 }
                 catch (Exception e)
                 {
@@ -125,6 +124,7 @@ public class SQL_Init
         catch (Exception e)
         {
             System.out.println("An unexpected error occured.");
+            e.printStackTrace();
         }
     }
 }
