@@ -1,11 +1,19 @@
-package Visualization;
+package visualization;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
-public class vis1Frame extends JFrame {
+public class vis1Frame extends JFrame
+{
+
+    //login için flag
+    private static int did_login_succeed;
 
     // Global Bileşenler
     JLabel welcomeLabel;
@@ -18,7 +26,7 @@ public class vis1Frame extends JFrame {
     JLabel passLabel;
 
     // Tema ve İkon Durumu
-    boolean isDarkMode = true;
+    static public boolean isDarkMode = true;
     private boolean isPasswordVisible = false;
 
     // Konumlandırma Gecikmesi için Timer (Debouncing)
@@ -26,8 +34,8 @@ public class vis1Frame extends JFrame {
     private static final int RESIZE_DELAY_MS = 100; // 100 milisaniye gecikme
 
     // İkon Yolları (Lütfen kendi yollarınızı doğrulayın)
-    private final String ICON_PATH_OPEN = "C:\\Kodlama\\Yazlab\\src\\Visualization\\gozuacik.png";
-    private final String ICON_PATH_CLOSED = "C:\\Kodlama\\Yazlab\\src\\Visualization\\gozukapali.png";
+    private final String ICON_PATH_OPEN = "/assets/gozuacik.png";
+    private final String ICON_PATH_CLOSED = "/assets/gozukapali.png";
 
     // Sabitler
     static final double FORM_START_X_PERCENT = 0.38;
@@ -48,7 +56,8 @@ public class vis1Frame extends JFrame {
     private ImageIcon iconClosed;
 
 
-    public vis1Frame() {
+    public vis1Frame()
+    {
 
         // FRAME AYAR
         this.setTitle("Kocaeli Üniversitesi Giriş Ekranı");
@@ -103,31 +112,57 @@ public class vis1Frame extends JFrame {
 
         //  BUTON İŞLEYİCİLER   LOGİN BUTON BURDA
         loginButton.addActionListener(e -> {
-            String user = usernameField.getText();
+            String email = usernameField.getText();
             String pass = new String(passwordField.getPassword());
 
-            if("Admin".equals(user) && "3169".equals(pass)){
+            did_login_succeed = CheckAccInfo(email, pass);
 
-                // Başarılı giriş: vis2Frame'e geçiş
+            if(did_login_succeed == 3) // admin girişi başarılı
+            {
                 vis2Frame newScreen = new vis2Frame();
-                newScreen.setDarkMode(this.isDarkMode); // Tema bilgisini yeni frame'e taşı
+                newScreen.setDarkMode(isDarkMode);
                 newScreen.setVisible(true);
-
-                vis1Frame.this.dispose(); // Mevcut pencereyi kapat
+                vis1Frame.this.dispose();
 
             }
-            else{
-                JOptionPane.showMessageDialog(vis1Frame.this,
-                        "Hatalı Kullanıcı Adı veya Parola.",
+            else if(did_login_succeed == 2) // koordinatör girişi başarılı
+            {
+                vis2Frame newScreen = new vis2Frame();
+                newScreen.setDarkMode(isDarkMode);
+                newScreen.setVisible(true);
+                vis1Frame.this.dispose();
+            }
+            else if(did_login_succeed == 1) // eposta doğru şifre yanlış
+            {
+                JOptionPane.showMessageDialog
+                        (vis1Frame.this,
+                        "E-posta ile parola uyuşmuyor.",
                         "Giriş Başarısız", JOptionPane.ERROR_MESSAGE);
+            }
+            else if(did_login_succeed == 0) // eposta yanlış
+            {
+                JOptionPane.showMessageDialog
+                        (vis1Frame.this,
+                        "Girilen e-posta bulunamadı.",
+                        "Giriş Başarısız", JOptionPane.ERROR_MESSAGE);
+            }
+            else
+            {
+                JOptionPane.showMessageDialog
+                        (vis1Frame.this,
+                        "Bilinmeyen hata.",
+                        "??????", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         togglePasswordButton.addActionListener(e -> {
             isPasswordVisible = !isPasswordVisible;
-            if (isPasswordVisible) {
+            if (isPasswordVisible)
+            {
                 passwordField.setEchoChar((char) 0);
-            } else {
+            }
+            else
+            {
                 passwordField.setEchoChar('*');
             }
             updateToggleButtonIcon();
@@ -144,37 +179,42 @@ public class vis1Frame extends JFrame {
     }
 
     // Tema bilgisini vis2Frame'den almak için metot
-    public void setDarkMode(boolean isDark) {
-        this.isDarkMode = isDark;
+    public void setDarkMode(boolean isDark)
+    {
+        isDarkMode = isDark;
         applyTheme();
         updateToggleButtonIcon();
     }
 
     // YARDIMCI METOTLAR
 
-    private void updateToggleButtonIcon() {
+    private void updateToggleButtonIcon()
+    {
         int buttonHeight = togglePasswordButton.getHeight();
         int iconSize = (int)(buttonHeight * 0.8);
         if (iconSize < 10) iconSize = 10;
 
-        try {
-            iconOpen = new ImageIcon(
-                    new ImageIcon(ICON_PATH_OPEN).getImage()
-                            .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH)
-            );
-            iconClosed = new ImageIcon(
-                    new ImageIcon(ICON_PATH_CLOSED).getImage()
-                            .getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH)
-            );
+        try
+        {
+            iconOpen = new ImageIcon
+            (new ImageIcon(ICON_PATH_OPEN).getImage().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
+            System.out.println(iconSize + "\n");
+            iconClosed = new ImageIcon
+            (new ImageIcon(ICON_PATH_CLOSED).getImage().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH));
 
             togglePasswordButton.setText("");
-            if (isPasswordVisible) {
+            if (isPasswordVisible)
+            {
                 togglePasswordButton.setIcon(iconClosed);
-            } else {
+            }
+            else
+            {
                 togglePasswordButton.setIcon(iconOpen);
             }
 
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             togglePasswordButton.setText(isPasswordVisible ? "GİZLE" : "GÖSTER");
             togglePasswordButton.setIcon(null);
         }
@@ -192,7 +232,9 @@ public class vis1Frame extends JFrame {
             fieldFg = Color.BLACK;
             buttonBg = new Color(30, 30, 30);
             themeButton.setText("L");
-        } else {
+        }
+        else
+        {
             background = Color.WHITE;
             foreground = Color.BLACK;
             fieldBg = Color.WHITE;
@@ -222,7 +264,8 @@ public class vis1Frame extends JFrame {
     }
 
     // PENCERE BOYUT HESAPLAYICI (Dinamik Konumlandırma)
-    void updateComponentBounds() {
+    void updateComponentBounds()
+    {
         int frameWidth = this.getContentPane().getWidth();
         int frameHeight = this.getContentPane().getHeight();
 
@@ -307,7 +350,54 @@ public class vis1Frame extends JFrame {
         this.repaint();
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(vis1Frame::new);
+    // Hesap bilgilerinin kontrolü için fonksiyon
+    public static int CheckAccInfo(String email, String password)
+    {
+
+        String url = "jdbc:mysql://localhost:3306/muhendislik_fakulte?serverTimezone=UTC&useSSL=false";
+        String user = "root";
+        String pass = "yazlab1";
+
+        String sql = "SELECT sifre, is_admin FROM bolum_koordinator WHERE eposta = ?";
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement ps = conn.prepareStatement(sql))
+        {
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    String dbPassword = rs.getString("sifre");
+                    boolean isAdmin = rs.getBoolean("is_admin");
+
+                    if (dbPassword.equals(password))
+                    {
+                        System.out.println("Giriş başarılı, sisteme yönlendiriliyorsunuz.");
+                        if (isAdmin)
+                        {
+                            System.out.println("Hoşgeldiniz, admin!");
+                            return 3;
+                        }
+                        return 2;
+                    }
+                    else
+                    {
+                        System.out.println("Belirtilen E-posta ve şifre uyuşmuyor.");
+                        return 1;
+                    }
+                }
+                else
+                {
+                    System.out.println("Belirtilen E-posta sisteme kayıtlı değil.");
+                    return 0;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
     }
 }

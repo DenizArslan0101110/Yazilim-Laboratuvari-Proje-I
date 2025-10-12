@@ -1,4 +1,4 @@
-package Visualization;
+package visualization;
 
 import javax.swing.*;
 import java.awt.*;
